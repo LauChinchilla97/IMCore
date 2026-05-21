@@ -1,4 +1,4 @@
-package com.imcoretemp
+package com.IMCore
 
 import android.app.Application
 import com.facebook.react.PackageList
