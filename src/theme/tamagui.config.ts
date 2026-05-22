@@ -6,9 +6,8 @@ export const config = createTamagui({
 
   tokens: {
     ...defaultConfig.tokens,
-
     color: {
-      white: '#FFFFFF',
+      white: '#ffffff',
       primary: '#FF551A',
       secondary: '#001F3F',
       gray: '#5F6368',
@@ -18,10 +17,22 @@ export const config = createTamagui({
   themes: {
     light: {
       background: '#F7F8FA',
-      color: '#001F3F',
+      card: '#FFFFFF',
+      textMuted: '#64748B',
+      border: '#E2E8F0',
       primary: '#FF551A',
-      gray: '#5F6368',
-      white: '#FFFFFF',
+      white: '#000000',
+      text: '#0F172A', 
+    },
+
+    dark: {
+      background: '#0B1220',
+      card: '#111827',
+      textMuted: '#94A3B8',
+      border: '#1F2937',
+      primary: '#FF551A',
+      white: '#ffffff',
+      text: '#FFFFFF', 
     },
   },
 })

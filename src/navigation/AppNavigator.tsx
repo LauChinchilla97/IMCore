@@ -1,29 +1,24 @@
 import React from 'react'
-import { createStaticNavigation } from '@react-navigation/native'
+import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 import LoginScreen from '../screens/LoginScreen'
-import HomeScreen from '../screens/HomeScreen'
+import DrawerNavigator from './DrawerNavigator'
 
-const RootStack = createNativeStackNavigator({
-  screens: {
-    Login: {
-      screen: LoginScreen,
-      options: {
-        headerShown: false,
-      },
-    },
-    Home: {
-      screen: HomeScreen,
-      options: {
-        headerShown: false,
-      },
-    },
-  },
-})
+const Stack = createNativeStackNavigator()
 
-const Navigation = createStaticNavigation(RootStack)
+export default function AppNavigator({ setTheme }: any) {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        
+        <Stack.Screen name="Main">
+          {() => <DrawerNavigator setTheme={setTheme} />}
+        </Stack.Screen>
 
-export default function AppNavigator() {
-  return <Navigation />
+        <Stack.Screen name="Login" component={LoginScreen} />
+
+      </Stack.Navigator>
+    </NavigationContainer>
+  )
 }
