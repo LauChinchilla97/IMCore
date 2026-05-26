@@ -99,7 +99,7 @@ export default function LoginScreen() {
                 <XStack
                   alignItems="center"
                   backgroundColor="#f5f5f5"
-                  borderRadius={12}
+                  borderRadius={6}
                   marginBottom="$3"
                   paddingHorizontal="$2"
                   borderWidth={1}
@@ -134,7 +134,7 @@ export default function LoginScreen() {
                 <XStack
                   alignItems="center"
                   backgroundColor="#f5f5f5"
-                  borderRadius={12}
+                  borderRadius={6}
                   marginBottom="$4"
                   borderWidth={1}
                   paddingHorizontal="$2"

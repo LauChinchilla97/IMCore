@@ -5,7 +5,6 @@ import * as LucideIcons from 'lucide-react-native'
 import { createDrawerNavigator, DrawerContentScrollView, DrawerContentComponentProps } from '@react-navigation/drawer'
 import { Button, Text, View, useTheme, useThemeName } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
-import HomeScreen from '../screens/HomeScreen'
 import { SCREENS } from '../screens/screens'
 
 type MenuItem = {
@@ -28,6 +27,9 @@ const createDrawerContent = (setTheme: any) => {
 
 export default function DrawerNavigator({ setTheme }: any) {
   const theme = useTheme()
+    const screenTitles = Object.fromEntries(
+      rawMenu.map(item => [item.identicator, item.title])
+    )
 
   return (
     <Drawer.Navigator
@@ -37,6 +39,7 @@ export default function DrawerNavigator({ setTheme }: any) {
         drawerType: 'slide',
         headerStyle: {
           backgroundColor: theme.background?.val,
+          height: 50,
         },
         headerTintColor: theme.text?.val,
         drawerStyle: {
@@ -47,98 +50,88 @@ export default function DrawerNavigator({ setTheme }: any) {
         drawerInactiveTintColor: theme.textMuted?.val,
       }}
     >
-      {/* <Drawer.Screen name="Inicio" component={HomeScreen} /> */}
-
       {Object.entries(SCREENS).map(([name, component]) => (
         <Drawer.Screen
           key={name}
           name={name}
           component={component}
+          options={{
+            title: screenTitles[name] ?? name,
+          }}
         />
       ))}
-
-
     </Drawer.Navigator>
   )
 }
 
+const rawMenu = [
+  {
+    id: 0,
+    code: 'DIS-0000',
+    title: 'Inicio',
+    parent_Id: 0,
+    parent_Code: 'N/A',
+    icon: 'Home',
+    identicator: 'inicio',
+  },
+  {
+    id: 1,
+    code: 'DIS-0001',
+    title: 'Seguridad',
+    parent_Id: 0,
+    parent_Code: 'N/A',
+    icon: 'Lock',
+    identicator: 'seguridad',
+  },
+  {
+    id: 2,
+    code: 'DIS-0001.0001',
+    title: 'Usuarios',
+    parent_Id: 1,
+    parent_Code: 'DIS-0001',
+    icon: 'Users',
+    identicator: 'usuarios',
+  },
+  {
+    id: 3,
+    code: 'DIS-0001.0002',
+    title: 'Accesos',
+    parent_Id: 1,
+    parent_Code: 'DIS-0001',
+    icon: 'LogIn',
+    identicator: 'accesos',
+  },
+  {
+    id: 4,
+    code: 'DIS-0001.0003',
+    title: 'Permisos',
+    parent_Id: 1,
+    parent_Code: 'DIS-0001',
+    icon: 'Lock',
+    identicator: 'permisos',
+  },
+  {
+    id: 5,
+    code: 'DIS-0002',
+    title: 'Gira',
+    parent_Id: 0,
+    parent_Code: 'N/A',
+    icon: 'Route',
+    identicator: 'gira',
+  },
+  {
+    id: 6,
+    code: 'DIS-0002.0001',
+    title: 'Gastos',
+    parent_Id: 5,
+    parent_Code: 'DIS-0002',
+    icon: 'BanknoteArrowUp',
+    identicator: 'gastos',
+  },
+]
+
 function CustomDrawerContent( props: DrawerContentComponentProps & { setTheme: any } ) {
   const navigation = useNavigation()
-
-  const rawMenu = [
-      {
-      id: 0,
-      code: 'DIS-0000',
-      title: 'Inicio',
-      parent_Id: 0,
-      parent_Code: 'N/A',
-      icon: 'Home',
-      identicator: 'inicio',
-    },
-    {
-      id: 1,
-      code: 'DIS-0001',
-      title: 'Seguridad',
-      parent_Id: 0,
-      parent_Code: 'N/A',
-      icon: 'Lock',
-      identicator: 'seguridad',
-    },
-    {
-      id: 2,
-      code: 'DIS-0001.0001',
-      title: 'Usuarios',
-      parent_Id: 1,
-      parent_Code: 'DIS-0001',
-      icon: 'Users',
-      identicator: 'usuarios',
-    },
-    {
-      id: 3,
-      code: 'DIS-0001.0002',
-      title: 'Accesos',
-      parent_Id: 1,
-      parent_Code: 'DIS-0001',
-      icon: 'LogIn',
-      identicator: 'accesos',
-    },
-    {
-      id: 4,
-      code: 'DIS-0001.0003',
-      title: 'Permisos',
-      parent_Id: 1,
-      parent_Code: 'DIS-0001',
-      icon: 'Lock',
-      identicator: 'permisos',
-    },
-    {
-      id: 5,
-      code: 'DIS-0002',
-      title: 'Recursos Humanos',
-      parent_Id: 0,
-      parent_Code: 'N/A',
-      icon: 'Users',
-      identicator: 'rrhh',
-    },
-    {
-      id: 6,
-      code: 'DIS-0002.0001',
-      title: 'Empleados',
-      parent_Id: 5,
-      parent_Code: 'DIS-0002',
-      icon: 'User',
-      identicator: 'empleados',
-    },
-    {
-      id: 7,
-      code: 'DIS-0002.0002',
-      title: 'Evaluaciones',
-      parent_Id: 5,
-      parent_Code: 'DIS-0002',
-      icon: 'check-circle',
-      identicator: 'evaluaciones',
-    },
-  ]
 
   const MENU = buildMenuTree(rawMenu)
   return (
@@ -185,11 +178,10 @@ function CustomDrawerContent( props: DrawerContentComponentProps & { setTheme: a
 
         <View>
           {MENU.map((item, index) => (
-            // <TreeItem key={`${item.title}-${index}`} item={item} />
             <TreeItem
-  item={item}
-  navigation={props.navigation}
-/>
+              item={item}
+              navigation={props.navigation}
+            />
           ))}
         </View>
       </DrawerContentScrollView>

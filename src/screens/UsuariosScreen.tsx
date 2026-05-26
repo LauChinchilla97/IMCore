@@ -1,7 +1,7 @@
 import React from 'react'
 import { YStack, Text } from 'tamagui'
 
-export default function ProfileScreen() {
+export default function UsuariosScreen() {
   return (
     <YStack
       flex={1}

@@ -1,21 +1,36 @@
 import React from 'react'
-import { YStack, Text, Button } from 'tamagui'
+import { YStack, Text, Button, Image } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
+import { ImageBackground } from 'react-native'
 
 export default function HomeScreen() {
   const navigation = useNavigation()
 
   return (
-    <YStack flex={1} justifyContent="center" alignItems="center">
-      <Text fontSize={24} marginBottom="$4">
-        ¡Bienvenido!
-      </Text>
-
-      <Button
-        onPress={() => navigation.navigate('Login' as never)}
+    <ImageBackground
+      source={require('../assets/bg-intermoda-entrada.png')}
+      resizeMode="cover"
+      style={{ flex: 1 }}
+    >
+      <YStack
+        flex={1}
+        justifyContent="flex-end"
+        alignItems="center"
+        paddingBottom="$10"
+        backgroundColor="#1e3a5fc7"
       >
-        <Text>Cerrar sesión</Text>
-      </Button>
-    </YStack>
+        <YStack position="absolute" top={120} alignItems="center" width="100%">
+          <Image
+            source={require('../assets/logo.png')}
+            style={{
+              width: 300,
+              height: 220,
+              resizeMode: 'contain',
+              tintColor: 'white',
+            }}
+          />
+        </YStack>
+      </YStack>
+    </ImageBackground>
   )
 }
