@@ -6,34 +6,34 @@ import { createDrawerNavigator, DrawerContentScrollView, DrawerContentComponentP
 import { Button, Text, View, useTheme, useThemeName } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import { SCREENS } from '../screens/screens'
-
-type MenuItem = {
-  id: number
-  code: string
-  title: string
-  parent_Id: number
-  parent_Code: string
-  icon?: string
-  children?: MenuItem[]
-}
+import { useMenu } from '../context/MenuContext'
+import { MenuDTO } from '../api/modules/security/security.types'
+import { useAuth } from '../context/AuthContext'
 
 const Drawer = createDrawerNavigator()
 
-const createDrawerContent = (setTheme: any) => {
+const createDrawerContent = (setTheme: any, menu: MenuDTO[] = []) => {
   return function DrawerContent(props: any) {
-    return <CustomDrawerContent {...props} setTheme={setTheme} />
+    return (
+      <CustomDrawerContent
+        {...props}
+        setTheme={setTheme}
+        menu={menu}
+      />
+    )
   }
 }
 
 export default function DrawerNavigator({ setTheme }: any) {
   const theme = useTheme()
-    const screenTitles = Object.fromEntries(
-      rawMenu.map(item => [item.identicator, item.title])
-    )
+  const { menu } = useMenu()
+  const screenTitles = Object.fromEntries(
+    (menu ?? []).map(item => [item.Identificator, item.Name])
+  )
 
   return (
     <Drawer.Navigator
-      drawerContent={createDrawerContent(setTheme)}
+      drawerContent={createDrawerContent(setTheme, menu)}
       screenOptions={{
         headerShown: true,
         drawerType: 'slide',
@@ -50,13 +50,13 @@ export default function DrawerNavigator({ setTheme }: any) {
         drawerInactiveTintColor: theme.textMuted?.val,
       }}
     >
-      {Object.entries(SCREENS).map(([name, component]) => (
+      {Object.entries(SCREENS).map(([Name, component]) => (
         <Drawer.Screen
-          key={name}
-          name={name}
+          key={Name}
+          name={Name}
           component={component}
           options={{
-            title: screenTitles[name] ?? name,
+            title: screenTitles[Name] ?? Name,
           }}
         />
       ))}
@@ -64,76 +64,12 @@ export default function DrawerNavigator({ setTheme }: any) {
   )
 }
 
-const rawMenu = [
-  {
-    id: 0,
-    code: 'DIS-0000',
-    title: 'Inicio',
-    parent_Id: 0,
-    parent_Code: 'N/A',
-    icon: 'Home',
-    identicator: 'inicio',
-  },
-  {
-    id: 1,
-    code: 'DIS-0001',
-    title: 'Seguridad',
-    parent_Id: 0,
-    parent_Code: 'N/A',
-    icon: 'Lock',
-    identicator: 'seguridad',
-  },
-  {
-    id: 2,
-    code: 'DIS-0001.0001',
-    title: 'Usuarios',
-    parent_Id: 1,
-    parent_Code: 'DIS-0001',
-    icon: 'Users',
-    identicator: 'usuarios',
-  },
-  {
-    id: 3,
-    code: 'DIS-0001.0002',
-    title: 'Accesos',
-    parent_Id: 1,
-    parent_Code: 'DIS-0001',
-    icon: 'LogIn',
-    identicator: 'accesos',
-  },
-  {
-    id: 4,
-    code: 'DIS-0001.0003',
-    title: 'Permisos',
-    parent_Id: 1,
-    parent_Code: 'DIS-0001',
-    icon: 'Lock',
-    identicator: 'permisos',
-  },
-  {
-    id: 5,
-    code: 'DIS-0002',
-    title: 'Gira',
-    parent_Id: 0,
-    parent_Code: 'N/A',
-    icon: 'Route',
-    identicator: 'gira',
-  },
-  {
-    id: 6,
-    code: 'DIS-0002.0001',
-    title: 'Gastos',
-    parent_Id: 5,
-    parent_Code: 'DIS-0002',
-    icon: 'BanknoteArrowUp',
-    identicator: 'gastos',
-  },
-]
-
-function CustomDrawerContent( props: DrawerContentComponentProps & { setTheme: any } ) {
+function CustomDrawerContent(props: DrawerContentComponentProps & { setTheme: any; menu: MenuDTO[] }) {
   const navigation = useNavigation()
+  const { user } = useAuth()
 
-  const MENU = buildMenuTree(rawMenu)
+  const MENU = buildMenuTree(props.menu ?? [])
+
   return (
     <View flex={1} backgroundColor="$background">
 
@@ -151,22 +87,22 @@ function CustomDrawerContent( props: DrawerContentComponentProps & { setTheme: a
           shadowRadius={10}
         >
           <View flexDirection="row" alignItems="center" gap={12}>
-          <View
-            width={42}
-            height={42}
-            borderRadius={21}
-            backgroundColor="#1e3a5f"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Text color="white" fontSize={16} fontWeight="700">
-              LC
-            </Text>
-          </View>
+            <View
+              width={42}
+              height={42}
+              borderRadius={21}
+              backgroundColor="#1e3a5f"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Text color="white" fontSize={16} fontWeight="700">
+                LC
+              </Text>
+            </View>
 
             <View>
               <Text color="$text" fontSize={14} fontWeight="600">
-                Laura Chinchilla
+                {user?.employee_Name}
               </Text>
 
               <Text color="$textMuted" fontSize={12} marginTop={2}>
@@ -179,6 +115,7 @@ function CustomDrawerContent( props: DrawerContentComponentProps & { setTheme: a
         <View>
           {MENU.map((item, index) => (
             <TreeItem
+              key={item.Id ?? index}
               item={item}
               navigation={props.navigation}
             />
@@ -227,32 +164,37 @@ function CustomDrawerContent( props: DrawerContentComponentProps & { setTheme: a
             IMCore v1.0
           </Text>
 
-          <ThemeToggle setTheme={props.setTheme} />
+          <ThemeToggle/>
         </View>
       </View>
     </View>
   )
 }
 
-export function buildMenuTree(list: MenuItem[]) {
-  const map = new Map<number, MenuItem>()
+export function buildMenuTree(menu: MenuDTO[] = []) {
+  const map = new Map<number, MenuDTO & { children: MenuDTO[] }>()
 
-  const roots: MenuItem[] = []
-  list.forEach(item => {
-    map.set(item.id, { ...item, children: [] })
-  })
-  list.forEach(item => {
-    const node = map.get(item.id)!
+  const roots: (MenuDTO & { children: MenuDTO[] })[] = []
 
-    if (item.parent_Id === 0) {
+  for (const item of menu) {
+    map.set(item.Id, { ...item, children: [] })
+  }
+
+  for (const item of menu) {
+    const node = map.get(item.Id)
+    if (!node) continue
+
+    if (!item.Parent_Id || item.Parent_Id === 0) {
       roots.push(node)
     } else {
-      const parent = map.get(item.parent_Id)
+      const parent = map.get(item.Parent_Id)
       if (parent) {
-        parent.children!.push(node)
+        parent.children.push(node)
+      } else {
+        roots.push(node)
       }
     }
-  })
+  }
 
   return roots
 }
@@ -267,7 +209,7 @@ function TreeItem({
   navigation: any
 }) {
   const [open, setOpen] = useState(false)
-  const Icon = LucideIcons[item.icon as keyof typeof LucideIcons]
+  const Icon = LucideIcons[item.Icon as keyof typeof LucideIcons]
   const hasChildren = item.children?.length > 0
 
   const theme = useTheme()
@@ -277,8 +219,7 @@ function TreeItem({
       setOpen(!open)
       return
     }
-
-    navigation.navigate(item.identicator)
+    navigation.navigate(item.Identificator)
   }
 
 
@@ -304,7 +245,7 @@ function TreeItem({
             )}
 
             <Text color="$text" fontSize={14}>
-              {item.title}
+              {item.Name}
             </Text>
           </View>
 
@@ -323,16 +264,18 @@ function TreeItem({
             key={`${child.title}-${index}`}
             item={child}
             level={level + 1}
-             navigation={navigation}
+            navigation={navigation}
           />
         ))}
     </>
   )
 }
 
-function ThemeToggle({ setTheme }: { setTheme: (t: 'light' | 'dark') => void }) {
+function ThemeToggle() {
   const themeName = useThemeName()
   const isDark = themeName === 'dark'
+
+  const { setTheme } = useAuth()
 
   return (
     <TouchableOpacity

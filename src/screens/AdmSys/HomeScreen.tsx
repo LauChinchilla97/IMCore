@@ -8,7 +8,7 @@ export default function HomeScreen() {
 
   return (
     <ImageBackground
-      source={require('../assets/bg-intermoda-entrada.png')}
+      source={require('../../assets/bg-intermoda-entrada.png')}
       resizeMode="cover"
       style={{ flex: 1 }}
     >
@@ -21,7 +21,7 @@ export default function HomeScreen() {
       >
         <YStack position="absolute" top={120} alignItems="center" width="100%">
           <Image
-            source={require('../assets/logo.png')}
+            source={require('../../assets/logo.png')}
             style={{
               width: 300,
               height: 220,

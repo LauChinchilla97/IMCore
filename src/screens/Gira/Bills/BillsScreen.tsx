@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { YStack, Text, ScrollView, Card, XStack, View, useTheme } from 'tamagui'
-import { Bill } from '../Interfaces'
+import { Bill } from './types'
 import { Pencil, Plus } from 'lucide-react-native'
 import Page from '../../../components/Page'
 import { useNavigation } from '@react-navigation/native'

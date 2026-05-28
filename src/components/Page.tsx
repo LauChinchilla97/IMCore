@@ -21,7 +21,7 @@ interface HeaderActionsProps {
 function HeaderActions({ actions, color }: HeaderActionsProps) {
   return (
     <XStack
-      gap="$3"
+      gap="$5"
       paddingRight="$5"
       alignItems="center"
     >

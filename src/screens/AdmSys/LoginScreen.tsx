@@ -1,9 +1,14 @@
-import React from 'react'
-import { YStack, Card, Input, Button, Text, XStack } from 'tamagui'
+import * as Burnt from 'burnt'
+import React, { useState } from 'react'
+import { YStack, Card, Input, Button, Text, XStack, Spinner  } from 'tamagui'
 import { ImageBackground, Image } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { User, Lock, LogIn } from 'lucide-react-native'
 import { useForm, Controller } from 'react-hook-form'
+import { UsersDTO } from '../../api/modules/security/security.types'
+import { useAuth } from '../../context/AuthContext'
+import { securityService } from '../../api/modules/security/security.service'
+import { useMenu } from '../../context/MenuContext'
 
 type FormData = {
   username: string
@@ -12,7 +17,9 @@ type FormData = {
 
 export default function LoginScreen() {
   const navigation = useNavigation()
-
+  const [loading, setLoading] = useState(false)
+  const { login } = useAuth()
+  const { refreshMenu } = useMenu()
   const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
     defaultValues: {
       username: '',
@@ -21,14 +28,48 @@ export default function LoginScreen() {
     mode: 'onTouched'
   })
 
-  const onSubmit = (data: FormData) => {
-    console.log('LOGIN DATA:',data, errors)
-    navigation.navigate('Main' as never)
+  const loginUser = async (data: FormData) => {
+    try {
+      setLoading(true)
+
+      const users: UsersDTO[] = await securityService.getUsers()
+
+      const user: UsersDTO = users.find(
+        (u) => u.user_Code === data?.username
+      )
+
+      if (!user) {
+        Burnt.toast({
+          title: 'Usuario no encontrado',
+          message: 'Verifica tu usuario e intenta nuevamente',
+          preset: 'error',
+        })
+
+        return
+      }
+
+      await refreshMenu(user.user_Code)
+
+      login(user)
+
+      navigation.navigate('Main' as never)
+
+    } catch (error) {
+
+      Burnt.toast({
+        title: 'Error',
+        message: 'Ocurrió un problema al iniciar sesión',
+        preset: 'error',
+      })
+
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <ImageBackground
-      source={require('../assets/bg-intermoda-entrada.png')}
+      source={require('../../assets/bg-intermoda-entrada.png')}
       resizeMode="cover"
       style={{ flex: 1 }}
     >
@@ -42,7 +83,7 @@ export default function LoginScreen() {
         {/* LOGO */}
         <YStack position="absolute" top={120} alignItems="center" width="100%">
           <Image
-            source={require('../assets/logo.png')}
+            source={require('../../assets/logo.png')}
             style={{
               width: 300,
               height: 220,
@@ -168,17 +209,30 @@ export default function LoginScreen() {
               </Text>
             </XStack>
 
-            <Button
-              backgroundColor="$primary"
-              height={45}
-              onPress={handleSubmit(onSubmit)}
-            >
-              <LogIn size={18} color="white" />
+              <Button
+                backgroundColor="$primary"
+                height={45}
+                disabled={loading}
+                opacity={loading ? 0.7 : 1}
+                onPress={handleSubmit(loginUser)}
+              >
+                {loading ? (
+                  <XStack alignItems="center" gap="$2">
+                    <Spinner color="white" />
+                    <Text color="white" fontWeight="700">
+                      Iniciando...
+                    </Text>
+                  </XStack>
+                ) : (
+                  <>
+                    <LogIn size={18} color="white" />
 
-              <Text color="white" fontWeight="700" marginLeft="$2">
-                Iniciar Sesión
-              </Text>
-            </Button>
+                    <Text color="white" fontWeight="700" marginLeft="$2">
+                      Iniciar Sesión
+                    </Text>
+                  </>
+                )}
+              </Button>
 
           </YStack>
         </Card>

@@ -1,12 +1,10 @@
-import UsuariosScreen from './UsuariosScreen'
-import HomeScreen from '../screens/HomeScreen'
+import UsersScreen from './Security/UsersScreen'
+import HomeScreen from './AdmSys/HomeScreen'
 import BillsScreen from './Gira/Bills/BillsScreen'
-// import BillFormScreen from './Gira/Bills/BillsFormScreen'
 
 export const SCREENS = {
   inicio: HomeScreen,
-  usuarios: UsuariosScreen,
+  usuarios: UsersScreen,
 
   gastos: BillsScreen,
-  // gasto_form: BillFormScreen,
 }
