@@ -29,6 +29,7 @@ export const config = createTamagui({
       buttonPrimary: '#FF551A',
       buttonCancel: '#E2E8F0',
       buttonCancelText: '#0F172A', 
+      textUser: '#e2dddd',
     },
 
     dark: {
@@ -45,6 +46,7 @@ export const config = createTamagui({
       buttonPrimary: '#FF551A',
       buttonCancel: '#bcbcbc',
       buttonCancelText: '#FFFFFF',
+      textUser: '#1e3a5f',
     },
   },
 })

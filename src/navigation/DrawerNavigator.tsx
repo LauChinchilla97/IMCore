@@ -26,10 +26,10 @@ const createDrawerContent = (setTheme: any, menu: MenuDTO[] = []) => {
 
 export default function DrawerNavigator({ setTheme }: any) {
   const theme = useTheme()
-  const { menu } = useMenu()
-  const screenTitles = Object.fromEntries(
-    (menu ?? []).map(item => [item.Identificator, item.Name])
-  )
+  const { menu, loading } = useMenu()
+  if (loading) return null
+  
+  const screenTitles = Object.fromEntries((menu ?? []).map(item => [item.Identificator, item.Name]))
 
   return (
     <Drawer.Navigator
@@ -55,9 +55,7 @@ export default function DrawerNavigator({ setTheme }: any) {
           key={Name}
           name={Name}
           component={component}
-          options={{
-            title: screenTitles[Name] ?? Name,
-          }}
+          options={{ title: Name === 'not_found' ? 'Página no encontrada' : screenTitles[Name] ?? Name }}
         />
       ))}
     </Drawer.Navigator>
@@ -66,32 +64,41 @@ export default function DrawerNavigator({ setTheme }: any) {
 
 function CustomDrawerContent(props: DrawerContentComponentProps & { setTheme: any; menu: MenuDTO[] }) {
   const navigation = useNavigation()
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
 
   const MENU = buildMenuTree(props.menu ?? [])
 
   return (
     <View flex={1} backgroundColor="$background">
 
-      <DrawerContentScrollView
-        {...props}
-        contentContainerStyle={{ paddingTop: 14 }}
+      <View
+        marginBottom={2}
+        borderRadius={14}
+        padding={14}
+        marginLeft={14}
+        marginRight={14}
+        marginTop={16}
+        backgroundColor="$textUser"
+        shadowColor="#000"
+        shadowOpacity={0.06}
+        shadowRadius={10}
       >
-        <View
-          marginBottom={14}
-          borderRadius={14}
-          padding={14}
-          backgroundColor="$card"
-          shadowColor="#000"
-          shadowOpacity={0.06}
-          shadowRadius={10}
-        >
-          <View flexDirection="row" alignItems="center" gap={12}>
+        <View flexDirection="row" alignItems="center" gap={12}>
+          <View
+            width={50}
+            height={50}
+            borderRadius={25}
+            borderWidth={2.5}
+            borderColor="$primary"
+            justifyContent="center"
+            alignItems="center"
+            padding={2}
+          >
             <View
               width={42}
               height={42}
               borderRadius={21}
-              backgroundColor="#1e3a5f"
+              backgroundColor="$gray"
               justifyContent="center"
               alignItems="center"
             >
@@ -99,18 +106,24 @@ function CustomDrawerContent(props: DrawerContentComponentProps & { setTheme: an
                 LC
               </Text>
             </View>
+          </View>
 
-            <View>
-              <Text color="$text" fontSize={14} fontWeight="600">
-                {user?.employee_Name}
-              </Text>
+          <View>
+            <Text color="$text" fontSize={14} fontWeight="600">
+              {user?.employee_Name}
+            </Text>
 
-              <Text color="$textMuted" fontSize={12} marginTop={2}>
-                Informática
-              </Text>
-            </View>
+            <Text color="$textMuted" fontSize={12} marginTop={2}>
+              Informática
+            </Text>
           </View>
         </View>
+      </View>
+
+      <DrawerContentScrollView
+        {...props}
+        contentContainerStyle={{ paddingTop: 12 }}
+      >
 
         <View>
           {MENU.map((item, index) => (
@@ -132,7 +145,13 @@ function CustomDrawerContent(props: DrawerContentComponentProps & { setTheme: an
           alignItems="center"
           justifyContent="center"
           pressStyle={{ opacity: 0.8 }}
-          onPress={() => navigation.navigate('Login' as never)}
+          onPress={async () => {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Login' as never }],
+            })
+            await logout()
+          }}
         >
           <LogOut size={18} color="white" />
 
@@ -219,7 +238,12 @@ function TreeItem({
       setOpen(!open)
       return
     }
-    navigation.navigate(item.Identificator)
+    const route = item.Identificator
+    if (navigation.getState().routeNames.includes(route)) {
+      navigation.navigate(route)
+    } else {
+      navigation.navigate('not_found', { name: route })
+    }
   }
 
 

@@ -31,27 +31,18 @@ export default function LoginScreen() {
   const loginUser = async (data: FormData) => {
     try {
       setLoading(true)
-
       const users: UsersDTO[] = await securityService.getUsers()
-
-      const user: UsersDTO = users.find(
-        (u) => u.user_Code === data?.username
-      )
-
+      const user = users.find((u) => u.user_Code === data?.username) as UsersDTO | undefined
       if (!user) {
         Burnt.toast({
           title: 'Usuario no encontrado',
           message: 'Verifica tu usuario e intenta nuevamente',
           preset: 'error',
         })
-
         return
       }
-
       await refreshMenu(user.user_Code)
-
       login(user)
-
       navigation.navigate('Main' as never)
 
     } catch (error) {

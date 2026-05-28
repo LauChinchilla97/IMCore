@@ -6,6 +6,7 @@ import { securityService } from '../../api/modules/security/security.service'
 import { UsersDTO } from '../../api/modules/security/security.types'
 import Page from '../../components/Page'
 import { useAuth } from '../../context/AuthContext'
+import SkeletonList from '../../components/Skeletons/SkeletonList'
 
 export default function UsersScreen() {
   const navigation = useNavigation()
@@ -15,7 +16,7 @@ export default function UsersScreen() {
 
   const [data, setData] = useState<UsersDTO[]>([])
 
-  const getInfo = async () => {
+  const getInfo = React.useCallback(async () => {
     try {
       setLoading(true)
       const response: UsersDTO[] = await securityService.getUsers()
@@ -23,7 +24,7 @@ export default function UsersScreen() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     getInfo()
@@ -33,41 +34,26 @@ export default function UsersScreen() {
     return state ? '#16a34a' : '#dc2626'
   }
 
+  const headerActions = React.useMemo(() => [
+    {
+      icon: RotateCw,
+      onPress: getInfo,
+    },
+    {
+      icon: Plus,
+      onPress: () => {},
+    },
+  ], [getInfo])
+
   return (
-    <Page
-      headerActions={[
-        {
-          icon: RotateCw,
-          onPress: getInfo,
-        },
-        {
-          icon: Plus,
-          onPress: () => {},
-        },
-      ]}
-    >
+    <Page headerActions={headerActions}>
       <YStack
         flex={1}
-        backgroundColor="$backgroundPage"
+        backgroundColor="$card2"
         padding="$3"
       >
-
         {loading ? (
-          <YStack
-            flex={1}
-            justifyContent="center"
-            alignItems="center"
-            gap="$3"
-          >
-            <Spinner
-              size="large"
-              color="$text"
-            />
-
-            <Text color="$text">
-              Cargando...
-            </Text>
-          </YStack>
+          <SkeletonList/>
         ) : (
           <ScrollView
             showsVerticalScrollIndicator={false}
@@ -76,7 +62,7 @@ export default function UsersScreen() {
             {data.map((item) => (
               <Card
                 key={item.id}
-                backgroundColor="$card2"
+                backgroundColor="$backgroundPage"
                 borderRadius={10}
                 padding="$3"
                 marginBottom="$2"
@@ -168,23 +154,6 @@ export default function UsersScreen() {
                         fontWeight="700"
                         color="$text"
                       >
-                        Empresa
-                      </Text>
-
-                      <Text
-                        fontSize={12}
-                        color="$textMuted"
-                      >
-                        {item.company_Code}
-                      </Text>
-                    </XStack>
-
-                    <XStack justifyContent="space-between">
-                      <Text
-                        fontSize={12}
-                        fontWeight="700"
-                        color="$text"
-                      >
                         Correo
                       </Text>
 
@@ -198,32 +167,7 @@ export default function UsersScreen() {
                       </Text>
                     </XStack>
 
-                    <XStack justifyContent="space-between">
-                      <Text
-                        fontSize={12}
-                        fontWeight="700"
-                        color="$text"
-                      >
-                        Validación AD
-                      </Text>
-
-                      <Text
-                        fontSize={12}
-                        color="$textMuted"
-                      >
-                        {item.validateAD ? 'Sí' : 'No'}
-                      </Text>
-                    </XStack>
-
                   </YStack>
-
-                  {/* FOOTER */}
-                  <Text
-                    fontSize={10}
-                    color="$textMuted"
-                  >
-                    Creado por: {item.create_By}
-                  </Text>
 
                   <Text
                     fontSize={10}

@@ -185,13 +185,13 @@ export default function BillsScreen() {
                 },
             ]}
         >
-            <YStack flex={1} backgroundColor="$backgroundPage" padding="$3">
+            <YStack flex={1} backgroundColor="$card2" padding="$3">
                 <ScrollView showsVerticalScrollIndicator={false} marginBottom="$3">
                     <YStack gap="$1">
                         {data.map((item, index) => (
                             <Card
                                 key={index}
-                                backgroundColor="$card2"
+                                backgroundColor="$backgroundPage"
                                 borderRadius={10}
                                 padding="$3"
                                 marginBottom="$2"

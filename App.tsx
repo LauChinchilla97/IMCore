@@ -1,5 +1,5 @@
 import React from 'react'
-import { TamaguiProvider, Theme } from 'tamagui'
+import { TamaguiProvider, Text, Theme, View } from 'tamagui'
 import { config } from './src/theme/tamagui.config'
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
@@ -11,10 +11,8 @@ import { MenuProvider } from './src/context/MenuContext'
 
 
 function Root() {
-  const { theme } = useAuth()
-
+  const { theme, loading } = useAuth()
   const Stack = createNativeStackNavigator()
-
   const navigationTheme = {
     light: {
       background: '#ffffff',
@@ -27,8 +25,8 @@ function Root() {
       primary: '#FF551A',
     },
   }
-
   const navColors = navigationTheme[theme]
+  if (loading) return null
 
   return (
     <TamaguiProvider config={config} defaultTheme={theme}>
@@ -54,6 +52,17 @@ function Root() {
               }}
             />
           </Stack.Navigator>
+            <View
+              position="absolute"
+              bottom={10}
+              right={12}
+              pointerEvents="none"
+            >
+              <Text color="$textMuted" fontSize={11}>
+                IMCore v1.0
+              </Text>
+            </View>
+
         </NavigationContainer>
       </Theme>
     </TamaguiProvider>

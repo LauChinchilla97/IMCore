@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { MenuDTO } from '../api/modules/security/security.types'
 import { securityService } from '../api/modules/security/security.service'
 
@@ -6,32 +7,47 @@ type MenuContextType = {
   menu: MenuDTO[]
   setMenu: (menu: MenuDTO[]) => void
   refreshMenu: (userCode: string) => Promise<void>
+  loading: boolean
 }
 
 const MenuContext = createContext<MenuContextType>({} as MenuContextType)
 
 export const MenuProvider = ({ children }: { children: React.ReactNode }) => {
   const [menu, setMenu] = useState<MenuDTO[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadMenu = async () => {
+      try {
+        const savedMenu = await AsyncStorage.getItem('menu')
+
+        if (savedMenu) {
+          setMenu(JSON.parse(savedMenu))
+        }
+      } catch (e) {
+        console.log(e)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadMenu()
+  }, [])
 
   const refreshMenu = async (userCode: string) => {
     const data = await securityService.getMenu()
-    const filtered = data.filter(
-      (m) => m.User_Code === userCode
-    )
+
+    const filtered = data.filter((m) => m.User_Code === userCode)
+
     setMenu(filtered)
+
+    await AsyncStorage.setItem('menu', JSON.stringify(filtered))
   }
 
   return (
-    <MenuContext.Provider
-      value={{
-        menu,
-        setMenu,
-        refreshMenu,
-      }}
-    >
+    <MenuContext.Provider value={{ menu, setMenu, refreshMenu, loading }}>
       {children}
     </MenuContext.Provider>
   )
 }
-
 export const useMenu = () => useContext(MenuContext)
