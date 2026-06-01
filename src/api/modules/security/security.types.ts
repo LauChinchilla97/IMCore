@@ -1,28 +1,33 @@
 export type LoginRequest = {
-  username: string
+  Code: string
   password: string
 }
 
 export type LoginResponse = {
-  token: string
-  name: string
+  Success: boolean
+  SuccessMessage: string
+  ErrorMessage: string
+  InfoUser: string 
 }
 
-export type UsersDTO = {
-  id : number;
-  employee_Name : string;
-  company_Code : string;
-  user_Code : string;
-  email? : string;
-  employee_Code : string;
-  user_Password : string;
-  state : boolean;
-  validateAD?: boolean;
-  modified_By? : string;
-  modification_Date? : string | Date;
-  create_By : string;
-  creation_Date : string | Date;
-  theme: string;
+export interface UsersDTO {
+  Id: number
+  Code: string
+  Name: string
+  LastName: string
+  Email: string
+  PasswordHash: string
+  Status_Id: string
+  Theme: string
+  Access: string
+
+  Create_By: string
+  Creation_Date: string | Date
+
+  Modified_By: string
+  Modification_Date: string | Date | null
+  DynamicColumns?: Record<string, string>
+  [key: string]: any
 }
 
 export type MenuDTO = {
@@ -30,9 +35,9 @@ export type MenuDTO = {
   Code: string;
   Name: string;
   Description: string;
-  Identificator: string;
+  Route: string;
   Icon: string;
-  Parent_Id: number;
+  ParentMenu_Id: number;
   MenuOrder: number;
   Status_Code: string;
   User_Code: string;

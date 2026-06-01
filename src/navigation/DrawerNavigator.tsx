@@ -29,7 +29,7 @@ export default function DrawerNavigator({ setTheme }: any) {
   const { menu, loading } = useMenu()
   if (loading) return null
   
-  const screenTitles = Object.fromEntries((menu ?? []).map(item => [item.Identificator, item.Name]))
+  const screenTitles = Object.fromEntries((menu ?? []).map(item => [item.Route, item.Name]))
 
   return (
     <Drawer.Navigator
@@ -110,7 +110,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps & { setTheme: an
 
           <View>
             <Text color="$text" fontSize={14} fontWeight="600">
-              {user?.employee_Name}
+              {user?.Name} {user?.Last_Name}
             </Text>
 
             <Text color="$textMuted" fontSize={12} marginTop={2}>
@@ -203,10 +203,10 @@ export function buildMenuTree(menu: MenuDTO[] = []) {
     const node = map.get(item.Id)
     if (!node) continue
 
-    if (!item.Parent_Id || item.Parent_Id === 0) {
+    if (!item.ParentMenu_Id || item.ParentMenu_Id === 0) {
       roots.push(node)
     } else {
-      const parent = map.get(item.Parent_Id)
+      const parent = map.get(item.ParentMenu_Id)
       if (parent) {
         parent.children.push(node)
       } else {
@@ -238,7 +238,7 @@ function TreeItem({
       setOpen(!open)
       return
     }
-    const route = item.Identificator
+    const route = item.Route
     if (navigation.getState().routeNames.includes(route)) {
       navigation.navigate(route)
     } else {

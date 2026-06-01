@@ -4,9 +4,10 @@ import { Pencil, Plus, RotateCw } from 'lucide-react-native'
 import { YStack, Text, ScrollView, Card, XStack, View, useTheme, Spinner  } from 'tamagui'
 import { securityService } from '../../api/modules/security/security.service'
 import { UsersDTO } from '../../api/modules/security/security.types'
-import Page from '../../components/Page'
+import Page from '../../components/commons/Page'
 import { useAuth } from '../../context/AuthContext'
 import SkeletonList from '../../components/Skeletons/SkeletonList'
+import { ExecutionResponse } from '../../api/modules/response.type'
 
 export default function UsersScreen() {
   const navigation = useNavigation()
@@ -19,8 +20,11 @@ export default function UsersScreen() {
   const getInfo = React.useCallback(async () => {
     try {
       setLoading(true)
-      const response: UsersDTO[] = await securityService.getUsers()
-      setData(response)
+      const response: ExecutionResponse<UsersDTO[]> = await securityService.getUsers()
+      console.log(response?.Data);
+      if(response.Success){
+        setData(response?.Data)
+      }
     } finally {
       setLoading(false)
     }
@@ -29,10 +33,6 @@ export default function UsersScreen() {
   useEffect(() => {
     getInfo()
   }, [])
-
-  const getStatusColor = (state: boolean) => {
-    return state ? '#16a34a' : '#dc2626'
-  }
 
   const headerActions = React.useMemo(() => [
     {
@@ -61,34 +61,31 @@ export default function UsersScreen() {
           >
             {data.map((item) => (
               <Card
-                key={item.id}
+                key={item.Id}
                 backgroundColor="$backgroundPage"
                 borderRadius={10}
                 padding="$3"
                 marginBottom="$2"
               >
                 <YStack gap="$2">
-
-                  {/* HEADER */}
                   <XStack
                     justifyContent="space-between"
                     alignItems="center"
                   >
-
                     <YStack>
                       <Text
                         fontSize={14}
                         fontWeight="800"
                         color="$text"
                       >
-                        {item.employee_Name}
+                        {item.Name} {item.LastName}
                       </Text>
 
                       <Text
                         fontSize={11}
                         color="$textMuted"
                       >
-                        {item.user_Code}
+                        {item.Code}
                       </Text>
                     </YStack>
 
@@ -96,19 +93,24 @@ export default function UsersScreen() {
                       alignItems="center"
                       gap="$2"
                     >
-
                       <View
                         paddingHorizontal={8}
                         paddingVertical={2}
                         borderRadius={999}
-                        backgroundColor={getStatusColor(item.state)}
+                        backgroundColor={
+                          item.Status_Id === '1'
+                            ? '#22c55e'
+                            : '#ef4444'
+                        }
                       >
                         <Text
                           fontSize={10}
                           color="white"
                           fontWeight="700"
                         >
-                          {item.state ? 'Activo' : 'Inactivo'}
+                          {item.Status_Id === '1'
+                            ? 'Activo'
+                            : 'Inactivo'}
                         </Text>
                       </View>
 
@@ -123,50 +125,36 @@ export default function UsersScreen() {
                           color={theme.button?.val}
                         />
                       </View>
-
                     </XStack>
-
                   </XStack>
 
                   {/* BODY */}
                   <YStack gap="$2">
 
-                    <XStack justifyContent="space-between">
-                      <Text
-                        fontSize={12}
-                        fontWeight="700"
-                        color="$text"
-                      >
-                        Código Empleado
-                      </Text>
 
-                      <Text
-                        fontSize={12}
-                        color="$textMuted"
-                      >
-                        {item.employee_Code}
-                      </Text>
-                    </XStack>
+                    {/* COLUMNAS DINÁMICAS */}
+                    {item.DynamicColumns &&
+                      Object.entries(item.DynamicColumns).map(([key, value]) => (
+                        <XStack
+                          key={key}
+                          justifyContent="space-between"
+                        >
+                          <Text
+                            fontSize={12}
+                            fontWeight="700"
+                            color="$text"
+                          >
+                            {key}
+                          </Text>
 
-                    <XStack justifyContent="space-between">
-                      <Text
-                        fontSize={12}
-                        fontWeight="700"
-                        color="$text"
-                      >
-                        Correo
-                      </Text>
-
-                      <Text
-                        fontSize={12}
-                        color="$textMuted"
-                        numberOfLines={1}
-                        maxWidth="60%"
-                      >
-                        {item.email || 'Sin correo'}
-                      </Text>
-                    </XStack>
-
+                          <Text
+                            fontSize={12}
+                            color="$textMuted"
+                          >
+                            {String(value)}
+                          </Text>
+                        </XStack>
+                      ))}
                   </YStack>
 
                   <Text
@@ -174,7 +162,7 @@ export default function UsersScreen() {
                     color="$textMuted"
                   >
                     Fecha creación:{' '}
-                    {new Date(item.creation_Date).toLocaleDateString()}
+                    {new Date(item.Creation_Date).toLocaleDateString()}
                   </Text>
 
                 </YStack>

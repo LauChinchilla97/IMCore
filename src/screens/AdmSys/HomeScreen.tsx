@@ -1,5 +1,5 @@
 import React from 'react'
-import { YStack, Text, Button, Image } from 'tamagui'
+import { YStack, Image, Text } from 'tamagui'
 import { useNavigation } from '@react-navigation/native'
 import { ImageBackground } from 'react-native'
 

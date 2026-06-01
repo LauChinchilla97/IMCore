@@ -71,23 +71,10 @@ export const AuthProvider = ({
   const login = async (userData: UsersDTO) => {
     try {
       setUser(userData)
-
-      const userTheme =
-        userData?.theme === 'dark'
-          ? 'dark'
-          : 'light'
-
+      const userTheme = userData?.Theme === 'dark' ? 'dark' : 'light'
       setThemeState(userTheme)
-
-      await AsyncStorage.setItem(
-        'user',
-        JSON.stringify(userData)
-      )
-
-      await AsyncStorage.setItem(
-        'theme',
-        userTheme
-      )
+      await AsyncStorage.setItem('user',JSON.stringify(userData))
+      await AsyncStorage.setItem('theme',userTheme)
     } catch (error) {
       console.log('Login error', error)
     }

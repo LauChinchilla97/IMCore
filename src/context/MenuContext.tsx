@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { MenuDTO } from '../api/modules/security/security.types'
 import { securityService } from '../api/modules/security/security.service'
+import { ExecutionResponse } from '../api/modules/response.type'
 
 type MenuContextType = {
   menu: MenuDTO[]
@@ -35,13 +36,9 @@ export const MenuProvider = ({ children }: { children: React.ReactNode }) => {
   }, [])
 
   const refreshMenu = async (userCode: string) => {
-    const data = await securityService.getMenu()
-
-    const filtered = data.filter((m) => m.User_Code === userCode)
-
-    setMenu(filtered)
-
-    await AsyncStorage.setItem('menu', JSON.stringify(filtered))
+    const data: ExecutionResponse<MenuDTO[]> = await securityService.getMenu(userCode)
+    setMenu(data.Data)
+    await AsyncStorage.setItem('menu', JSON.stringify(data.Data))
   }
 
   return (

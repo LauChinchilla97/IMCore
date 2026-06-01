@@ -3,26 +3,27 @@ import React, { useState } from 'react'
 import { YStack, Card, Input, Button, Text, XStack, Spinner  } from 'tamagui'
 import { ImageBackground, Image } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import { User, Lock, LogIn } from 'lucide-react-native'
+import { User, Lock, LogIn,Eye, EyeOff } from 'lucide-react-native'
 import { useForm, Controller } from 'react-hook-form'
-import { UsersDTO } from '../../api/modules/security/security.types'
 import { useAuth } from '../../context/AuthContext'
 import { securityService } from '../../api/modules/security/security.service'
 import { useMenu } from '../../context/MenuContext'
+import { Pressable } from 'react-native'
 
 type FormData = {
-  username: string
+  Code: string
   password: string
 }
 
 export default function LoginScreen() {
   const navigation = useNavigation()
+  const { refreshMenu } = useMenu()
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
-  const { refreshMenu } = useMenu()
   const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
     defaultValues: {
-      username: '',
+      Code: '',
       password: '',
     },
     mode: 'onTouched'
@@ -31,17 +32,19 @@ export default function LoginScreen() {
   const loginUser = async (data: FormData) => {
     try {
       setLoading(true)
-      const users: UsersDTO[] = await securityService.getUsers()
-      const user = users.find((u) => u.user_Code === data?.username) as UsersDTO | undefined
-      if (!user) {
+      const response = await securityService.login({ Code: data.Code, password: data.password})
+
+      if (!response?.Success) {
         Burnt.toast({
-          title: 'Usuario no encontrado',
-          message: 'Verifica tu usuario e intenta nuevamente',
+          title: response?.ErrorMessage || 'Error',
+          message: response?.ErrorMessage || 'Ocurrió un problema al iniciar sesión',
           preset: 'error',
         })
         return
       }
-      await refreshMenu(user.user_Code)
+
+      const user = JSON.parse(response.InfoUser)
+      await refreshMenu(user.Code)
       login(user)
       navigation.navigate('Main' as never)
 
@@ -119,7 +122,7 @@ export default function LoginScreen() {
 
             <Controller
               control={control}
-              name="username"
+              name="Code"
               rules={{
                 required: 'El usuario es obligatorio',
                 minLength: {
@@ -135,7 +138,7 @@ export default function LoginScreen() {
                   marginBottom="$3"
                   paddingHorizontal="$2"
                   borderWidth={1}
-                  borderColor={errors.username ? '#ef4444' : '#e5e5e5'}
+                  borderColor={errors.Code ? '#ef4444' : '#e5e5e5'}
                 >
                   <User size={20} color="#777" />
 
@@ -177,13 +180,21 @@ export default function LoginScreen() {
                   <Input
                     flex={1}
                     placeholder="Contraseña"
-                    secureTextEntry
+                    secureTextEntry={!showPassword}
                     value={value}
                     onChangeText={onChange}
                     size="$4"
                     borderWidth={0}
                     backgroundColor="transparent"
                   />
+
+                  <Pressable onPress={() => setShowPassword(!showPassword)}>
+                    {showPassword ? (
+                      <EyeOff size={20} color="#777" />
+                    ) : (
+                      <Eye size={20} color="#777" />
+                    )}
+                  </Pressable>
                 </XStack>
               )}
             />
