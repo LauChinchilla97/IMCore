@@ -65,6 +65,7 @@ export default function DrawerNavigator({ setTheme }: any) {
 function CustomDrawerContent(props: DrawerContentComponentProps & { setTheme: any; menu: MenuDTO[] }) {
   const navigation = useNavigation()
   const { user, logout } = useAuth()
+  const initials =`${user?.Name?.charAt(0) ?? ''}${user?.LastName?.charAt(0) ?? ''}`.toUpperCase()
 
   const MENU = buildMenuTree(props.menu ?? [])
 
@@ -103,14 +104,14 @@ function CustomDrawerContent(props: DrawerContentComponentProps & { setTheme: an
               alignItems="center"
             >
               <Text color="white" fontSize={16} fontWeight="700">
-                LC
+                {initials}
               </Text>
             </View>
           </View>
 
           <View>
             <Text color="$text" fontSize={14} fontWeight="600">
-              {user?.Name} {user?.Last_Name}
+              {user?.Name} {user?.LastName}
             </Text>
 
             <Text color="$textMuted" fontSize={12} marginTop={2}>

@@ -59,7 +59,7 @@ export default function SkeletonList() {
         <YStack gap="$2" paddingBottom="$4">
 
         {Array.from({ length: 6 }).map((_, i) => (
-            <View
+          <View
             key={i}
             backgroundColor="$backgroundPage"
             borderRadius={10}
@@ -77,24 +77,20 @@ export default function SkeletonList() {
 
                 <XStack gap="$2" alignItems="center">
                     <SkeletonBox width={60} height={18} radius={999} />
-                    <SkeletonBox width={24} height={24} radius={999} />
                 </XStack>
                 </XStack>
 
                 {/* BODY */}
                 <YStack gap="$2">
-                <XStack justifyContent="space-between">
-                    <SkeletonBox width={120} height={25} />
-                </XStack>
+  
 
                 <XStack justifyContent="space-between">
-                    <SkeletonBox width={80} height={10} />
-                    <SkeletonBox width={140} height={10} />
+                    <SkeletonBox width={150} height={10} />
                 </XStack>
                 </YStack>
 
                 {/* FOOTER */}
-                <SkeletonBox width={160} height={10} />
+                <SkeletonBox width={180} height={10} />
             </YStack>
             </View>
         ))}

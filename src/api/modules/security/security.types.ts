@@ -22,6 +22,7 @@ export interface UsersDTO {
   Access: string
 
   Create_By: string
+  Roles: string
   Creation_Date: string | Date
 
   Modified_By: string
